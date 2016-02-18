@@ -113,15 +113,14 @@ function deliver_orders( $in_path, $out_path ) {
 
 		$products_order = sort_order_products_by_weights( $readed_file, $order['p'] );
 
-		echo $d;
 		foreach ( $products_order as $product_id ) {
 
 			$closest_warehouses = find_warehouse( $readed_file, $product_id['id'], $drones->drone_state[$d]['coords'] );
 
-			// If this is the last product order, then delevery the order.
-			// Or if if the maximum load size of the drone is crossed
 			$t_weight = $w + $readed_file->weights[$product_id['id']]; // temporary weight
 
+			// If this is the last product order, then delevery the order.
+			// Or if if the maximum load size of the drone is crossed
 			if( end($products_order) === $product_id || $t_weight > $readed_file->first_line['max_load'] ){
 				$drones->deliver( $d, $order['id'] );
 				$writed_file->deliver( $d, $order['id'], $product_id['id'], 1 );
