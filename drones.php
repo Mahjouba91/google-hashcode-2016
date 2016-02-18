@@ -13,8 +13,8 @@
 
 class Drone {
 
-	private $in_file;
-	private $drone_state = array();
+	public $in_file;
+	public $drone_state = array();
 
 	function __construct( $file_in ) {
 		/** @var File_Reader $file_in */
