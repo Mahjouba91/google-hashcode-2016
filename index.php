@@ -120,7 +120,9 @@ function deliver_orders( $in_path, $out_path ) {
 
 			// If this is the last product order, then delevery the order.
 			// Or if if the maximum load size of the drone is crossed
-			if( end($products_order) === $product_id['id'] || $w + $readed_file->weights[$product_id['id']] > $readed_file->first_line['max_load'] ){
+			$t_weight = $w + $readed_file->weights[$product_id['id']]; // temporary weight
+
+			if( end($products_order) === $product_id || $t_weight > $readed_file->first_line['max_load'] ){
 				$drones->deliver( $d, $order['id'] );
 				$writed_file->deliver( $d, $order['id'], $product_id['id'], 1 );
 
@@ -131,7 +133,7 @@ function deliver_orders( $in_path, $out_path ) {
 				}
 			}
 			// Elseif : load the drone
-			elseif ( $w + $readed_file->weights[$product_id['id']] <= $readed_file->first_line['max_load'] ) {
+			elseif ( $t_weight <= $readed_file->first_line['max_load'] ) {
 				$drones->load( $d, $closest_warehouses[0]['id'] ); // Load the product on the drone
 				$w += $readed_file->weights[$product_id['id']]; // Add product weight
 				$t += $closest_warehouses[0]['dist'];
