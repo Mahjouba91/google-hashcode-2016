@@ -48,7 +48,7 @@ class File_Reader {
 		$last_index = 4;
 		for ( $j = 0; $j < $this->w; $j++ ) {
 			$this->warehouses[$j]['coords'] = $buffer[ $last_index + $i ];
-			$this->warehouses[$j]['p'] = $buffer[ $last_index + $i +1 ];
+			$this->warehouses[$j]['p'] = $buffer[ $last_index + $i + 1 ];
 			$i += 2;
 		}
 

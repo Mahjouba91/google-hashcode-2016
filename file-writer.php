@@ -27,19 +27,19 @@ class File_Writer {
 	}
 
 	public function load( $drone_id, $warehouse_id, $product_type_id, $num_of_items ) {
-		$this->buffer .= sprintf( '%d L %d %d %d\n', $drone_id, $warehouse_id, $product_type_id, $num_of_items );
+		$this->buffer .= sprintf( "%d L %d %d %d \n", $drone_id, $warehouse_id, $product_type_id, $num_of_items );
 	}
 
 	public function unload( $drone_id, $warehouse_id, $product_type_id, $num_of_items ) {
-		$this->buffer .= sprintf( '%d U %d %d %d\n', $drone_id, $warehouse_id, $product_type_id, $num_of_items );
+		$this->buffer .= sprintf( "%d U %d %d %d \n", $drone_id, $warehouse_id, $product_type_id, $num_of_items );
 	}
 
 	public function deliver( $drone_id, $order_id, $product_type_id, $num_of_items ) {
-		$this->buffer .= sprintf( '%d D %d %d %d\n', $drone_id, $order_id, $product_type_id, $num_of_items );
+		$this->buffer .= sprintf( "%d D %d %d %d \n", $drone_id, $order_id, $product_type_id, $num_of_items );
 	}
 
 	public function wait( $drone_id, $num_of_turns ) {
-		$this->buffer .= sprintf( '%d W %d %d %d\n', $drone_id, $num_of_turns );
+		$this->buffer .= sprintf( "%d W %d %d %d \n", $drone_id, $num_of_turns );
 	}
 
 }

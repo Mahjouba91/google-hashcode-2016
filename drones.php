@@ -18,6 +18,10 @@ class Drone {
 
 	function __construct( $file_in ) {
 		/** @var File_Reader $file_in */
+		if ( $file_in->first_line['rows'] == 300 ) {
+			var_dump( $file_in );
+		}
+
 		$this->in_file = $file_in; // Read entry file
 		for ( $i=0; $i < $file_in->first_line['drones_nb']; $i++ ) {
 			$this->drone_state[] = array(
@@ -25,6 +29,7 @@ class Drone {
 				'time'   => 0,
 			);
 		}
+
 	}
 
 	public function load( $drone_id, $warehouse_id ) {

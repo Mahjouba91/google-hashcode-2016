@@ -56,7 +56,7 @@ function find_warehouse( $in_file, $product_id, $drone_position ) {
 	$found_warehouses = array();
 	$i = 0;
 	foreach ( $in_file->warehouses as $warehouse_id => $warehouse ) {
-		if ( $warehouse['p'][$product_id] > 0 ) {
+		if ( (int) $warehouse['p'][$product_id] > 0 ) {
 			$found_warehouses[$i]['id'] = $warehouse_id;
 			$dist = get_drone_distance( $warehouse['coords'], $drone_position );
 			$found_warehouses[$i]['dist'] = $dist;
@@ -80,7 +80,6 @@ function sort_orders( $in_file, $warehouse_pos ) {
 	}
 	// Order by closest orders
 	$sorted_orders = bea_array_sort( $sorted_orders, 'dist', SORT_ASC );
-	var_dump($sorted_orders);
 	return $sorted_orders;
 }
 
@@ -113,16 +112,17 @@ function deliver_orders( $in_path, $out_path ) {
 	foreach ( $sorted_orders as $order ) {
 
 		$products_order = sort_order_products_by_weights( $readed_file, $order['p'] );
-		
+
+		echo $d;
 		foreach ( $products_order as $product_id ) {
 
-			$closest_warehouses = find_warehouse( $readed_file, $product_id, $drones->drone_state[$d]['coords'] );
+			$closest_warehouses = find_warehouse( $readed_file, $product_id['id'], $drones->drone_state[$d]['coords'] );
 
 			// If this is the last product order, then delevery the order.
 			// Or if if the maximum load size of the drone is crossed
-			if( end($products_order) === $product_id || $w + $readed_file->weights[$product_id] > $readed_file->first_line['max_load'] ){
+			if( end($products_order) === $product_id['id'] || $w + $readed_file->weights[$product_id['id']] > $readed_file->first_line['max_load'] ){
 				$drones->deliver( $d, $order['id'] );
-				$writed_file->deliver( $d, $order['id'], $product_id, 1 );
+				$writed_file->deliver( $d, $order['id'], $product_id['id'], 1 );
 
 				$w = 0; // reset the weight
 				$d++; // Change the drone;
@@ -131,12 +131,12 @@ function deliver_orders( $in_path, $out_path ) {
 				}
 			}
 			// Elseif : load the drone
-			elseif ( $w + $readed_file->weights[$product_id] <= $readed_file->first_line['max_load'] ) {
+			elseif ( $w + $readed_file->weights[$product_id['id']] <= $readed_file->first_line['max_load'] ) {
 				$drones->load( $d, $closest_warehouses[0]['id'] ); // Load the product on the drone
-				$w += $readed_file->weights[$product_id]; // Add product weight
+				$w += $readed_file->weights[$product_id['id']]; // Add product weight
 				$t += $closest_warehouses[0]['dist'];
 
-				$writed_file->load( $d, $closest_warehouses[0]['id'], $product_id, 1 );
+				$writed_file->load( $d, $closest_warehouses[0]['id'], $product_id['id'], 1 );
 			}
 
 		}
@@ -144,13 +144,15 @@ function deliver_orders( $in_path, $out_path ) {
 	}
 
 	$writed_file->write();
+	echo 'Simulation terminée';
 
 }
 
 require 'file-reader.php';
 require 'file-writer.php';
+require 'drones.php';
 
-$files = array( 'busy_day', 'mother_of_all_warehouses', 'redundancy' );
+$files = array( 'busy_day', 'mother_of_all_warehouses' );
 foreach ( $files as $file ) {
-	deliver_orders( 'input/' . $file . 'in', 'output/' . $file . 'out' );
+	deliver_orders( 'input/' . $file . '.in', 'output/' . $file . '.out' );
 }
