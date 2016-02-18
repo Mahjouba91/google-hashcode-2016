@@ -118,20 +118,32 @@ function deliver_orders( $in_path, $out_path ) {
 
 			$closest_warehouses = find_warehouse( $readed_file, $product_id, $drones->drone_state[$d]['coords'] );
 
-			if ( $w + $readed_file->weights[$product_id] <= $readed_file->first_line['max_load'] ) {
-				$w += $readed_file->weights[$product_id]; // Add product weight
-				$drones->load( $d, $closest_warehouses[0]['id'] ); // Load the product on the drone
+			// If this is the last product order, then delevery the order.
+			// Or if if the maximum load size of the drone is crossed
+			if( end($products_order) === $product_id || $w + $readed_file->weights[$product_id] > $readed_file->first_line['max_load'] ){
+				$drones->deliver( $d, $order['id'] );
+				$writed_file->deliver( $d, $order['id'], $product_id, 1 );
 
+				$w = 0; // reset the weight
+				$d++; // Change the drone;
+				if ( $d >= $readed_file->first_line['drones_nb'] ) {
+					$d = 0; // Restart from the first drone;
+				}
+			}
+			// Elseif : load the drone
+			elseif ( $w + $readed_file->weights[$product_id] <= $readed_file->first_line['max_load'] ) {
+				$drones->load( $d, $closest_warehouses[0]['id'] ); // Load the product on the drone
+				$w += $readed_file->weights[$product_id]; // Add product weight
+				$t += $closest_warehouses[0]['dist'];
+
+				$writed_file->load( $d, $closest_warehouses[0]['id'], $product_id, 1 );
 			}
 
 		}
 
-
-		$dist = get_drone_distance( $drones->drone_state[$d]['coords'], $drones->drone_state[$d]['coords'] );
-
-
 	}
 
+	$writed_file->write();
 
 }
 
