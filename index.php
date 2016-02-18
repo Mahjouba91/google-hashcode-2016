@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: TFLOR
- * Date: 11/02/2016
- * Time: 20:23
- */
 
 require 'file-reader.php';
 require 'file-writer.php';

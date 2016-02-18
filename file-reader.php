@@ -9,7 +9,6 @@
 /**
  * Class FileParser
  *
- * @since: 1.0
  */
 class File_Reader {
 
