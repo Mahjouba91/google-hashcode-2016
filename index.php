@@ -169,7 +169,7 @@ require 'file-writer.php';
 require 'drones.php';
 
 $total_score = 0;
-$files = array( 'busy_day', 'mother_of_all_warehouses' );
+$files = array( 'busy_day', 'mother_of_all_warehouses', 'redundancy' );
 foreach ( $files as $file ) {
 	$score = deliver_orders( 'input/' . $file . '.in', 'output/' . $file . '.out' );
 	echo 'Simulation terminée, score : ' . $score . "<br>";
