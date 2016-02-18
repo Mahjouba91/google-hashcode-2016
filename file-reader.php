@@ -29,7 +29,7 @@ class File_Reader {
 		}
 
 		$i = 0;
-		while ( ($buffer[] = fgets($handle, 4096) ) !== false ) {
+		while ( ($buffer[] = fgets( $handle ) ) !== false ) {
 			$buffer[$i] = explode(" ", $buffer[$i]);
 			$i++;
 		}
@@ -41,7 +41,7 @@ class File_Reader {
 		$this->first_line['max_load'] = (int) $buffer[0][4]; // maximum supported drone weight
 
 		$this->p = (int) $buffer[1][0]; // number of products
-		$this->weights = (int) $buffer[2]; // weight for each product type
+		$this->weights = $buffer[2]; // weight for each product type
 		$this->w = (int) $buffer[3][0]; // number of warehouses
 
 		$i = 0;
