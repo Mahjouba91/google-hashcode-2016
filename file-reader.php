@@ -42,7 +42,7 @@ class File_Reader {
 
 		$this->p = (int) $buffer[1][0];
 		$this->weights = (int) $buffer[2];
-		$this->w = (int) $buffer[3][0];
+		$this->w = (int) $buffer[3][0]; // number of warehouses
 
 		$i = 0;
 		$last_index = 4;
