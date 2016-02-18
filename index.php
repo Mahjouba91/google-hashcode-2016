@@ -160,7 +160,7 @@ function deliver_orders( $in_path, $out_path ) {
 	}
 
 	$writed_file->write();
-	echo 'Simulation terminée, score : ' . $score . "<br>";
+	return $score; // Score of the simulation
 
 }
 
@@ -168,7 +168,14 @@ require 'file-reader.php';
 require 'file-writer.php';
 require 'drones.php';
 
+$total_score = 0;
 $files = array( 'busy_day', 'mother_of_all_warehouses' );
 foreach ( $files as $file ) {
-	deliver_orders( 'input/' . $file . '.in', 'output/' . $file . '.out' );
+	$score = deliver_orders( 'input/' . $file . '.in', 'output/' . $file . '.out' );
+	echo 'Simulation terminée, score : ' . $score . "<br>";
+	$total_score += $score;
 }
+
+?>
+
+<h2>Score total : <?php echo $total_score; ?></h2>
