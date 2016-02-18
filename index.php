@@ -104,18 +104,19 @@ function deliver_orders( $in_path, $out_path ) {
 	$readed_file = new File_Reader( $in_path );
 	$writed_file = new File_Writer( $out_path );
 	$drones = new Drone( $readed_file );
+	$dead_line = $readed_file->first_line['deadline'];
 	$d = 0; // current drone_id
 	$w = 0; // current weight
 	$t = 0; // current time
+	$score = 0;
 
 	$sorted_orders = sort_orders( $readed_file, array( 0, 0 ) );
 	foreach ( $sorted_orders as $order ) {
 
 		$products_order = sort_order_products_by_weights( $readed_file, $order['p'] );
+		$drones_order = array(); // reset;
 
 		foreach ( $products_order as $product_id ) {
-
-			$closest_warehouses = find_warehouse( $readed_file, $product_id['id'], $drones->drone_state[$d]['coords'] );
 
 			$t_weight = $w + $readed_file->weights[$product_id['id']]; // temporary weight
 
@@ -125,6 +126,8 @@ function deliver_orders( $in_path, $out_path ) {
 				$drones->deliver( $d, $order['id'] );
 				$writed_file->deliver( $d, $order['id'], $product_id['id'], 1 );
 
+				$drones_order[] = $d;
+
 				$w = 0; // reset the weight
 				$d++; // Change the drone;
 				if ( $d >= $readed_file->first_line['drones_nb'] ) {
@@ -133,6 +136,8 @@ function deliver_orders( $in_path, $out_path ) {
 			}
 			// Elseif : load the drone
 			elseif ( $t_weight <= $readed_file->first_line['max_load'] ) {
+				$closest_warehouses = find_warehouse( $readed_file, $product_id['id'], $drones->drone_state[$d]['coords'] );
+
 				$drones->load( $d, $closest_warehouses[0]['id'] ); // Load the product on the drone
 				$w += $readed_file->weights[$product_id['id']]; // Add product weight
 				$t += $closest_warehouses[0]['dist'];
@@ -142,10 +147,20 @@ function deliver_orders( $in_path, $out_path ) {
 
 		}
 
+		// Know when the order is totaly delivered to the customer
+		$biggest_drone_time = 0;
+		foreach ( $drones_order as $drone_order ) {
+			if ( $biggest_drone_time < $drones->drone_state[$drone_order]['time'] ) {
+				$biggest_drone_time = $drones->drone_state[$drone_order]['time'];
+			}
+		}
+		$order_score = ( ( $dead_line - $biggest_drone_time ) / $dead_line ) * 100;
+		$score += ceil( $order_score );
+
 	}
 
 	$writed_file->write();
-	echo 'Simulation terminée';
+	echo 'Simulation terminée, score : ' . $score . "<br>";
 
 }
 
