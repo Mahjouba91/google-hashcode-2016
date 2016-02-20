@@ -65,7 +65,7 @@ function find_warehouse( $in_file, $product_id, $drone_position ) {
 	}
 	// Order by closest warehouses
 	$found_warehouses = bea_array_sort( $found_warehouses, 'dist', SORT_ASC );
-	return $found_warehouses;
+	return $found_warehouses[0];
 }
 
 // Deliver the orders from the closest warehouse
@@ -135,11 +135,11 @@ function deliver_orders( $in_path, $out_path ) {
 			elseif ( $t_weight <= $readed_file->first_line['max_load'] ) {
 				$closest_warehouses = find_warehouse( $readed_file, $product_type['id'], $drones->drone_state[$d]['coords'] );
 
-				$drones->load( $d, $closest_warehouses[0]['id'] ); // Load the product on the drone
+				$drones->load( $d, $closest_warehouses['id'] ); // Load the product on the drone
 				$w += $readed_file->weights[$product_type['id']]; // Add product weight
-				$t += $closest_warehouses[0]['dist'];
+				$t += $closest_warehouses['dist'];
 
-				$writed_file->load( $d, $closest_warehouses[0]['id'], $product_type['id'], 1 );
+				$writed_file->load( $d, $closest_warehouses['id'], $product_type['id'], 1 );
 			}
 
 		}
