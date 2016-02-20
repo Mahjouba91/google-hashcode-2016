@@ -89,15 +89,12 @@ function sort_order_products_by_weights( $in_file, $products_order ) {
 	/** @var File_Reader $in_file */
 	$i=0;
 	foreach ( $products_order as $product_id => $product_order ) {
-
 		$products[$i]['id'] = $product_id;
 		$products[$i]['weight'] = $in_file->weights[$product_id];
 		$i++;
 	}
 	$products = bea_array_sort( $products, 'weight', SORT_ASC );
-
 	return $products;
-
 }
 
 function deliver_orders( $in_path, $out_path ) {
@@ -110,21 +107,21 @@ function deliver_orders( $in_path, $out_path ) {
 	$t = 0; // current time
 	$score = 0;
 
-	$sorted_orders = sort_orders( $readed_file, array( 0, 0 ) );
+	$sorted_orders = sort_orders( $readed_file, $readed_file->warehouses[0]['coords'] );
 	foreach ( $sorted_orders as $order ) {
 
 		$products_order = sort_order_products_by_weights( $readed_file, $order['p'] );
 		$drones_order = array(); // reset;
 
-		foreach ( $products_order as $product_id ) {
+		foreach ( $products_order as $product_type ) {
 
-			$t_weight = $w + $readed_file->weights[$product_id['id']]; // temporary weight
+			$t_weight = $w + $readed_file->weights[$product_type['id']]; // temporary weight
 
 			// If this is the last product order, then delevery the order.
 			// Or if if the maximum load size of the drone is crossed
-			if( end($products_order) === $product_id || $t_weight > $readed_file->first_line['max_load'] ){
+			if( end($products_order) === $product_type || $t_weight > $readed_file->first_line['max_load'] ){
 				$drones->deliver( $d, $order['id'] );
-				$writed_file->deliver( $d, $order['id'], $product_id['id'], 1 );
+				$writed_file->deliver( $d, $order['id'], $product_type['id'], 1 );
 
 				$drones_order[] = $d;
 
@@ -136,13 +133,13 @@ function deliver_orders( $in_path, $out_path ) {
 			}
 			// Elseif : load the drone
 			elseif ( $t_weight <= $readed_file->first_line['max_load'] ) {
-				$closest_warehouses = find_warehouse( $readed_file, $product_id['id'], $drones->drone_state[$d]['coords'] );
+				$closest_warehouses = find_warehouse( $readed_file, $product_type['id'], $drones->drone_state[$d]['coords'] );
 
 				$drones->load( $d, $closest_warehouses[0]['id'] ); // Load the product on the drone
-				$w += $readed_file->weights[$product_id['id']]; // Add product weight
+				$w += $readed_file->weights[$product_type['id']]; // Add product weight
 				$t += $closest_warehouses[0]['dist'];
 
-				$writed_file->load( $d, $closest_warehouses[0]['id'], $product_id['id'], 1 );
+				$writed_file->load( $d, $closest_warehouses[0]['id'], $product_type['id'], 1 );
 			}
 
 		}
