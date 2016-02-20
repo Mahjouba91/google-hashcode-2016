@@ -75,10 +75,12 @@ function sort_orders( $in_file, $warehouse_pos ) {
 	$sorted_orders = $in_file->orders;
 	foreach ( $in_file->orders as $order_id => $order ) {
 		$sorted_orders[$order_id]['id'] = $order_id;
+		$sorted_orders[$order_id]['num_of_items'] = (int) $order['num_of_items'];
 		$dist = get_drone_distance( $order['coords'], $warehouse_pos );
 		$sorted_orders[$order_id]['dist'] = $dist;
 	}
 	// Order by closest orders
+	$sorted_orders = bea_array_sort( $sorted_orders, 'num_of_items', SORT_ASC );
 	$sorted_orders = bea_array_sort( $sorted_orders, 'dist', SORT_ASC );
 	return $sorted_orders;
 }
